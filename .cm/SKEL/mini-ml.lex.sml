@@ -1,2 +1,0 @@
-Skeleton 5
-ae"MiniMLLexFun"i2a‰¢Tokens"gp1c"MiniML_TOKENS"f7‰¢Int"d"Char"C‰¢List"d"String"‰¢TextIO"‰¢Vector"d"Errors"Nh3a‰¢yyInput"jh3a‰¢TIO"gp1ˇÅad"TSIO"gp2ˇÅ<d"StreamIO"ad"TPIO"gp1d"TextPrimIO"h0a‰¢UserDeclarations"h1aˇgp1ˇbbd2egp1ˇÇ<f7d"IO"ˇ1Cˇ?ˇˇÇ<ˇÅˇÅ.Nf0f1ˇÅ.

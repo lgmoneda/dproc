@@ -1,2 +1,0 @@
-Skeleton 5
-ae"MiniMLLrValsFun"i2aä¢Token"gp1c"TOKEN"f±ÿjh2ad"ParserData"h7aä¢Header"h1egp1d"AbstractSyntaxTree"aä¢LrTable"gp2ÿÿ&Caÿgpÿ*båçğ±ÿ&f6d"Char"Cd"List"d"String"d"General"ÿ&d"Array"Nbåçğ±ÿaä¢MlyValue"è0ad"EC"h2ÿ‚bÿ‚9æ±ÿƒad"Actions"h2bÿ‚9f2ÿ&ÿƒÿƒNad"Tokens"jÿƒgp1c"MiniML_TOKENS"gp1c"MiniML_LRVALS"
