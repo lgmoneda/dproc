@@ -1,0 +1,211 @@
+
+open AbstractSyntaxTree
+
+%%
+%header (functor DprocLrValsFun (structure Token : TOKEN) : Dproc_LRVALS)
+
+%name Dproc
+
+%eop EOF
+
+(*
+  %pos declares the type of positions for terminals (here, the line number)
+  Each symbol has an associated left and right position.
+*)
+%pos int
+
+%right    ARROW
+
+%nonassoc DARROW
+
+
+%nonassoc EQSIGN LESS GREATER LESSEQ GREATEREQ NEQ
+%left     KW_orelse
+%left     KW_andalso
+%nonassoc KW_not
+
+%left     TTIMES
+%left     CARET
+
+%left     PLUS MINUS
+%left     TIMES KW_mod KW_div 
+%nonassoc NEG
+
+%term  KW_andalso
+     | KW_bool
+     | KW_div
+     | KW_else
+     | KW_end
+     | KW_false
+     | KW_fn
+     | KW_fun
+     | KW_handle
+     | KW_if
+     | KW_in
+     | KW_int
+     | KW_let
+     | KW_mod
+     | KW_not
+     | KW_of
+     | KW_orelse
+     | KW_raise
+     | KW_string
+     | KW_then
+     | KW_true
+     | KW_val
+     | KW_and
+
+     | ARROW
+     | CARET
+     | COLON
+     | COMMA
+     | DARROW
+     | EOF
+     | EQSIGN
+     | NEQ
+     | GREATER
+     | GREATEREQ
+     | HASH
+     | LESS
+     | LESSEQ
+     | LPAREN
+     | MINUS
+     | NEG
+     | PLUS
+     | RPAREN
+     | TIMES
+     | TTIMES
+
+     | ID         of string
+     | INT        of int
+     | STRING     of string
+
+
+%nonterm
+       Start          of exp
+
+     | Decl           of decl
+     | ArgListDecl    of (id * typ option) list
+     | ArgListDeclSeq of (id * typ option) list
+
+     | Type           of typ
+     | TypeTuple2     of typ list
+     | TypeTuple      of typ
+     | TypeAtom       of typ
+
+     | Exp            of exp
+     | InfixExp       of exp
+     | Binops         of exp
+     | AtExp          of exp
+     | AtExpSeq       of exp
+     | ExpSeq         of exp list
+
+%pure
+
+%noshift EOF
+
+%verbose
+
+
+%%
+
+
+Start :
+       Exp                                (Exp)
+
+
+Decl :
+       KW_fun ID LPAREN ID COLON Type RPAREN COLON Type EQSIGN Exp
+                                          (FUN_D(ID1, ID2, Type1, Type2, Exp))
+     | KW_fun ID LPAREN ID COLON Type RPAREN COLON Type EQSIGN Exp 
+       KW_and ID LPAREN ID COLON Type RPAREN COLON Type EQSIGN Exp
+                                          (AND_D(ID1, ID2, Type1, Type2, Exp1,
+                                                 ID3, ID4, Type3, Type4, Exp2))
+     | KW_val ID EQSIGN Exp               (VAL_D(ID, Exp))
+
+
+Type :
+       TypeTuple ARROW Type               (FN_T(TypeTuple1, Type))
+     | TypeTuple                          (TypeTuple)
+
+TypeTuple :
+      TypeTuple2                          (case TypeTuple2 of
+                                             [] => raise Fail "This shouldn't happen"
+                                           | [x] => x
+                                           | x::xs => TUPLE_T TypeTuple2)
+
+TypeTuple2 :
+      TypeAtom                            ([TypeAtom])
+    | TypeAtom TIMES TypeTuple2            (TypeAtom::TypeTuple2)
+
+TypeAtom :
+       KW_int                             (INT_T)
+     | KW_bool                            (BOOL_T)
+     | KW_string                          (STRING_T)
+     | LPAREN Type RPAREN                 (Type)
+
+
+Exp :
+       InfixExp                           (InfixExp)
+     | KW_raise ID Exp                    (RAISE_E(ID, Exp))
+     | InfixExp KW_handle ID ID DARROW Exp     (HANDLE_E(InfixExp, ID1, ID2, Exp))
+     | HASH INT Exp                       (PROJ_E (INT, Exp))
+     | KW_fn ID COLON Type DARROW Exp
+                                          (FN_E (ID, Type, Exp))
+     | KW_fn LPAREN ID COLON Type RPAREN DARROW Exp
+                                          (FN_E (ID, Type, Exp))
+     | KW_if Exp KW_then Exp KW_else Exp  (IF_E (Exp1, Exp2, Exp3))
+     | KW_let Decl KW_in Exp KW_end       (LET_E (Decl, Exp))
+
+InfixExp :
+       Binops                             (Binops)
+     | AtExpSeq                           (AtExpSeq)
+
+
+Binops:
+       InfixExp PLUS       InfixExp       (BINOP_E(InfixExp1, PLUS_B,  InfixExp2))
+     | InfixExp MINUS      InfixExp       (BINOP_E(InfixExp1, MINUS_B, InfixExp2))
+     | InfixExp TIMES      InfixExp       (BINOP_E(InfixExp1, TIMES_B, InfixExp2))
+     | InfixExp KW_mod     InfixExp       (BINOP_E(InfixExp1, MOD_B,   InfixExp2))
+     | InfixExp KW_div     InfixExp       (BINOP_E(InfixExp1, DIV_B,   InfixExp2))
+
+     | InfixExp NEQ        InfixExp       (BINOP_E(InfixExp1, NEQ_B,   InfixExp2))
+     | InfixExp EQSIGN     InfixExp       (BINOP_E(InfixExp1, EQ_B,    InfixExp2))
+
+     | InfixExp LESS       InfixExp       (BINOP_E(InfixExp1, LT_B,    InfixExp2))
+     | InfixExp LESSEQ     InfixExp       (BINOP_E(InfixExp1, LEQ_B,   InfixExp2))
+     | InfixExp GREATER    InfixExp       (BINOP_E(InfixExp1, GT_B,    InfixExp2))
+     | InfixExp GREATEREQ  InfixExp       (BINOP_E(InfixExp1, GEQ_B,   InfixExp2))
+
+     | InfixExp KW_andalso InfixExp       (ANDALSO_E(InfixExp1, InfixExp2))
+     | InfixExp KW_orelse  InfixExp       (ORELSE_E(InfixExp1, InfixExp2))
+
+     | InfixExp CARET      InfixExp       (BINOP_E(InfixExp1, CARET_B, InfixExp2))
+
+
+
+AtExpSeq :
+       AtExpSeq AtExp                     (APP_E(AtExpSeq, AtExp))
+     | AtExp                              (AtExp)
+
+AtExp :
+       ID                                 (VAR_E    ID)
+     | INT                                (INT_E    INT)
+     | KW_true                            (TRUE_E)
+     | KW_false                           (FALSE_E)
+     | STRING                             (STRING_E STRING)
+
+     | LPAREN   ExpSeq RPAREN             (case ExpSeq of
+                                             [] => raise Fail "This shouldn't happen"
+                                           | [x] => x
+                                           | t => TUPLE_E ExpSeq)
+
+     | KW_not   AtExp                     (UNOP_E   (NOT_U,   AtExp))
+     | NEG      AtExp                     (UNOP_E   (NEG_U,   AtExp))
+
+
+
+ExpSeq :
+       Exp COMMA ExpSeq                   (Exp::ExpSeq)
+     | Exp                                ([Exp])
+

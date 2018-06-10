@@ -1,0 +1,2 @@
+Skeleton 5
+d2f4d"Int"d"TextIO"d"AbstractSyntaxTree"d"Errors"ad"Parser"jh3aä¢MiniMLLrVals"jh1aä¢Token"gp2ä¢LrParser"ÿgp1e"MiniMLLrValsFun"aä¢MiniMLLex"jh1aä¢Tokens"gp2ÿ?ÿ‚gp1e"MiniMLLexFun"ad"MiniMLParser"jh3aÿgp1ÿaä¢ParserData"gp2ÿ?ÿƒad"Lex"gp1ÿ‚gp1e"Join"h0
