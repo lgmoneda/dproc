@@ -1,9 +1,6 @@
 Group is
 
-  (* You might have to adjust the path to the libraries. *)
-  "C:\\Program Files\\SML.110.0.7\\lib\\smlnj-lib.cm"
-  "C:\\Program Files\\SML.110.0.7\\lib\\ml-yacc-lib.cm"
-
+  $/basis.cm
   mini-ml.lex
   mini-ml.grm
   parser.sml 
