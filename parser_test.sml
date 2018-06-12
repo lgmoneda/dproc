@@ -15,6 +15,13 @@ in
     makeTest("()",
       Ast.Unit
     ),
+    makeTest("1>2",
+      Ast.InfixApp(
+        Ast.IntConstant(1),
+        ">",
+        Ast.IntConstant(2)
+      )
+    ),
     makeTest("\"\"",
       Ast.StringConstant("")
     ),

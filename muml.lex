@@ -4,7 +4,7 @@
 %let int = {digit}+;
 %let letter = [a-zA-Z];
 %let id = {letter}({letter} | {digit} | "'" | "_")*;
-%let op = ("<" | ">" | "+" | "-" | "^" | "*" | "=")+;
+%let op = ("<" | "<=" | ">=" | "==" | "!=" | ">" | "+" | "-" | "/" | "*")+;
 
 %states CON_STRING;
 

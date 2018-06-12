@@ -18,7 +18,9 @@ in
     )),
     makeTest("2-3", Ast.eval(Ast.IntConstant(~1))),
     makeTest("2*3", Ast.eval(Ast.IntConstant(6))),
-    makeTest("16/4", Ast.eval(Ast.IntConstant(4)))
+    makeTest("16/4", Ast.eval(Ast.IntConstant(4))),
+    makeTest("1>2", Ast.eval(Ast.BoolConstant(true)))
+
 
     ])
 

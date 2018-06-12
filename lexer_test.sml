@@ -33,6 +33,8 @@ in
     makeTest("^", [MumlTokens.OP("^")]),
     makeTest("==>", [MumlTokens.OP("==>")]),
     makeTest("><+-", [MumlTokens.OP("><+-")]),
+    makeTest(">=", [MumlTokens.OP(">=")])
+    ,
 
     (* keywords *)
     makeTest("if", [MumlTokens.KW_if]),

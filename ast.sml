@@ -11,6 +11,7 @@ Ast = struct
   datatype Exp =
       IntConstant of int
     | StringConstant of string
+    | BoolConstant of bool
     | Unit
     | Variable of Symbol ref
     | App of Exp * Exp
@@ -57,7 +58,10 @@ Ast = struct
   fun argeq(Name(l), Name(r)) = !l = !r
     ;
 
-  fun eq_v(Int_v(i1), Int_v(i2)) = i1 = i2;
+  fun eq_v(v1:Value, v2:Value):bool = 
+    case (v1, v2) of
+      (Int_v v1, Int_v v2) => v1 = v2 |
+      (Bool_v v1, Bool_v v2) => v1 = v2;
 
   fun eq(IntConstant(l1), IntConstant(r1)) = l1 = r1
     | eq(StringConstant(l1), StringConstant(r1)) = l1 = r1
@@ -176,13 +180,23 @@ Ast = struct
       case e of
         IntConstant i => Int_v i  |
         StringConstant s => String_v s |
-        InfixApp(e1, s, e2) => eval_binop(eval(e1), s, eval(e2)) 
-        (*InfixApp(IntConstant a, "+", IntConstant b) => Int_v(a+b);*)
+        BoolConstant b => Bool_v b |
+        InfixApp(e1, s, e2) => eval_binop(eval(e1), s, eval(e2))
 
     and eval_binop(v1:Value, s:string, v2:Value):Value =
       case (v1, s, v2) of
         (Int_v i1, "+", Int_v i2) => Int_v(i1+i2) |
         (Int_v i1, "-", Int_v i2) => Int_v(i1-i2) |
-        (Int_v i1, "*", Int_v i2) => Int_v(i1*i2) ;
+        (Int_v i1, "*", Int_v i2) => Int_v(i1*i2) |
+        (Int_v i1, "/", Int_v i2) => Int_v(i1 div i2) |
+        (Int_v i1, ">", Int_v i2) => Bool_v(i1 > i2) |
+        (Int_v i1, ">=", Int_v i2) => Bool_v(i1 >= i2) |
+        (Int_v i1, "<", Int_v i2) => Bool_v(i1 < i2) |
+        (Int_v i1, "<=", Int_v i2) => Bool_v(i1 <= i2) |
+        (Int_v i1, "==", Int_v i2) => Bool_v(i1 = i2) |
+        (Int_v i1, "!=", Int_v i2) => Bool_v(i1 <> i2) |
+        
+        (String_v s1, "+", String_v s2) => String_v(s1 ^ s2)
+        ;
 
 end
