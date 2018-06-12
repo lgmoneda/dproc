@@ -31,6 +31,17 @@ structure Helpers =
           |  _ => raise Exceptions.ParseError ("parse error on " ^ inputString))
       end
 
+    fun string_to_val(inputString: string): Ast.Value =
+      let
+        val strm = MumlLexer.streamifyInstream (TextIO.openString inputString)
+        val lexer = MumlLexer.lex (AntlrStreamPos.mkSourcemap())
+        val (r, strm', errs) = MUML.parse lexer strm
+      in
+        (case r
+          of SOME(exp) => Ast.eval(exp)
+          |  _ => raise Exceptions.ParseError ("parse error on " ^ inputString))
+      end
+
     fun string_to_infer(inputString: string): Ast.Type option =
       TypeInference.infer(SymbolAnalysis.resolve(string_to_ast(inputString)))
 

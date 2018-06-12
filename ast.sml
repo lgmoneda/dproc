@@ -26,6 +26,12 @@ Ast = struct
     | Valdec of Arg * bool * Exp
     ;
 
+  datatype Value = Int_v of int
+    | String_v of string
+    | Float_v of real
+    | Bool_v of bool
+    ;
+
   datatype BaseKind =
       KInt
     | KString
@@ -50,6 +56,8 @@ Ast = struct
 
   fun argeq(Name(l), Name(r)) = !l = !r
     ;
+
+  fun eq_v(Int_v(i1), Int_v(i2)) = i1 = i2;
 
   fun eq(IntConstant(l1), IntConstant(r1)) = l1 = r1
     | eq(StringConstant(l1), StringConstant(r1)) = l1 = r1
@@ -163,5 +171,18 @@ Ast = struct
       | Valdec(name, recursive, body) =>
           (if recursive then "fun " else "val ") ^ toString_arg(name) ^ " = " ^ (parenthise body)
     end
+
+    fun eval(e:Exp):Value =
+      case e of
+        IntConstant i => Int_v i  |
+        StringConstant s => String_v s |
+        InfixApp(e1, s, e2) => eval_binop(eval(e1), s, eval(e2)) 
+        (*InfixApp(IntConstant a, "+", IntConstant b) => Int_v(a+b);*)
+
+    and eval_binop(v1:Value, s:string, v2:Value):Value =
+      case (v1, s, v2) of
+        (Int_v i1, "+", Int_v i2) => Int_v(i1+i2) |
+        (Int_v i1, "-", Int_v i2) => Int_v(i1-i2) |
+        (Int_v i1, "*", Int_v i2) => Int_v(i1*i2) ;
 
 end
