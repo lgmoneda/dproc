@@ -1,11 +1,27 @@
 %name MumlLexer;
 
-%let digit = [0-9];
-%let int = {digit}+;
-%let letter = [a-zA-Z];
-%let id = {letter}({letter} | {digit} | "'" | "_")*;
-%let op = ("<" | ">" | "+" | "-" | "^" | "*" | "=")+;
 
+%let digit = [0-9];
+
+%let int = {digit}+;
+
+%let float = ["+" | "-"] <digito>{<digito>}[","digito{<digito>}];
+
+%let letter = [a-zA-Z];
+
+%let id = {letter}({letter} | {digit} | "'" | "_")*;
+
+%let op = ("<" |"<="| ">" |">="| "+" | "-" | "^" | "*" | "=" | "**" | "or" | "and" |"/" | "==")+;
+
+%let string = " " " {<digito>|<letter>} " " ";
+
+%let bool = "true"| "false" ;
+
+%let list = "[" {string} | {int} | {bool} | {float} "]"
+
+%let column = "["{string} {list} "]"
+
+%let table = <string> \{<column>\}
 %states CON_STRING;
 
 %defs (
