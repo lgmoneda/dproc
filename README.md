@@ -46,10 +46,10 @@ The log would be:
      1. Division of the column ["Income"] from ["Demographic data"] by [12];
 	 
 ---> "Comp to avg income": 
-1. Logic operation [>] between column ["Income"] from ["Demographic data"] and [average of the column ["Income"] from ["Demographic Data"]], [1] if true, [0] otherwise;
+     1. Logic operation [>] between column ["Income"] from ["Demographic data"] and [average of the column ["Income"] from ["Demographic Data"]], [1] if true, [0] otherwise;
 
 ---> "Monthy Income percapita":
-1. Division of the column ["Monthly Income"] from ["Demographic Data"] by the column ["Family Size"] from ["Demographic data"];
+     1. Division of the column ["Monthly Income"] from ["Demographic Data"] by the column ["Family Size"] from ["Demographic data"];
 ```
 
 
