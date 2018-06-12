@@ -3,25 +3,46 @@
 
 %let digit = [0-9];
 
-%let int = {digit}+;
+%let int = ["+" | "-"] <digito>{<digito>};
 
-%let float = ["+" | "-"] <digito>{<digito>}[","digito{<digito>}];
+%let float = ["+" | "-"] <digito>{<digito>}["."digito{<digito>}];
 
 %let letter = [a-zA-Z];
 
+%let char = <letter> | "_";
+
 %let id = {letter}({letter} | {digit} | "'" | "_")*;
 
-%let op = ("<" |"<="| ">" |">="| "+" | "-" | "^" | "*" | "=" | "**" | "or" | "and" |"/" | "==")+;
+%let identifier = <char>{<char> | <digit> | <symbol>}
 
-%let string = " " " {<digito>|<letter>} " " ";
+%let symbol = "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">" | " \' " | " \" " | " = " | " | "  | " . " | " , " | " ; " ;
+
+/* %let op = ("<" |"<="| ">" |">="| "+" | "-" | "^" | "*" | "=" | "**" | "or" | "and" |"/" | "==")+; */
+
+%let aritmetic_op = "+" | "-" | "/" | "*" | "**";
+
+%let logic_op = "and" | "or";
+
+%let rel_ol = "<" |"<="| ">" |">="| "==";
+
+%let op = <aritmetic_op> | <logic_op> | <rel_op>;
+					   
+%let string = " \" " {<digito>|<letter>} " \" ";
 
 %let bool = "true"| "false" ;
 
-%let list = "[" {string} | {int} | {bool} | {float} "]"
+%let term = <string> | <int> | <bool> | <float>;
 
-%let column = "["{string} {list} "]"
+%let literal = <term> | <identifier>;
+					  
+%let list = "[" {string} | {int} | {bool} | {float} "]";
 
-%let table = <string> \{<column>\}
+%let column = "["{string} {list} "]";
+
+%let table = <string> \{<column>\};
+
+/* %let type  "int" | "float" | "bool" | "string" | "column" | "table"; */
+
 %states CON_STRING;
 
 %defs (
