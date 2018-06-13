@@ -1,4 +1,4 @@
-%name Muml;
+%name Dproc;
 
 %defs (
   structure A = Ast
@@ -6,15 +6,12 @@
 
 %tokens
 
-  : KW_let ("let") | KW_in ("in") | KW_end ("end")
-  | KW_fn ("fn") | KW_fun ("fun") | KW_val ("val")
-  | KW_if ("if") | KW_then ("then") | KW_else ("else")
-  | KW_andalso ("andalso") | KW_orelse ("orelse")
+  : KW_if ("if") | KW_then ("then") | KW_else ("else")
   | CON_int of Int.int | CON_string of string 
   | ID of string | OP_UNI of string | OP_BIN of string | OP_
   | LP ("(") | RP (")") | COMMA (",") | SEMI (";")| COLON (":")
   | LB ("[") | RB ("]") | DOT (".") | CSV ("csv") | NAME ("name") | AP ("'")
-  | ARROW ("=>") | TARROW ("->") | EQUAL ("=")
+  | EQUAL ("=")
   ;
 
 %start programa;
@@ -46,35 +43,34 @@ corpo
   ;
 
 cmd
-  : %try KW_TAB EQUAL KW_LOAD LP  AP CON_string DOT CSV AP COMMA NAME EQUAL AP CON_string AP RP =>(Ap.atr(KW_TAB, KW_LOAD, CON_string, DOT, CSV, CON_string ))
+  : %try ID EQUAL KW_LOAD LP  AP CON_string DOT CSV AP COMMA NAME EQUAL AP CON_string AP RP => (A.atr(KW_TAB, KW_LOAD, CON_string, DOT, CSV, CON_string ))
 
-  | %try KW_SAVE LP KW_TAB COMMA  AP CON_string DOT CSV AP RP =>(Ap.atr(KW_TAB, CON_string, DOT, CSV ))
+  | %try KW_SAVE LP KW_TAB COMMA  AP CON_string DOT CSV AP RP =>(A.atr(KW_TAB, CON_string, DOT, CSV ))
   
+  | %try ID EQUAL KW_MAX LP expCol RP =>(A.atr(ID , KW_MAX , expCol ))
   
-  | %try KW_FLOAT EQUAL KW_MAX LP expCol RP =>(Ap.atr(KW_FLOAT , KW_MAX , expCol ))
+  | %try ID EQUAL KW_MIN LP expCol RP =>(A.atr(ID , KW_MIN , expCol ))
   
-  | %try KW_FLOAT EQUAL KW_MIN LP expCol RP =>(Ap.atr(KW_FLOAT , KW_MIN , expCol ))
-  
-  | %try KW_FLOAT EQUAL KW_AVG LP expCol RP =>(Ap.atr(KW_FLOAT , KW_AVG , expCol ))
+  | %try ID EQUAL KW_AVG LP expCol RP =>(A.atr(ID , KW_AVG , expCol ))
 
-  | %try expCol EQUAL KW_SOMA LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_SOMA , expCol, expCol ))
+  | %try ID EQUAL KW_SOMA LP expCol COMMA expCol RP =>(A.atr(expCol , KW_SOMA , expCol, expCol ))
 
-  | %try expCol EQUAL KW_SUB LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_SUB , expCol, expCol ))
+  | %try ID EQUAL KW_SUB LP expCol COMMA expCol RP =>(A.atr(expCol , KW_SUB , expCol, expCol ))
 
-  | %try expCol EQUAL KW_MUL LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_MUL , expCol, expCol ))
+  | %try ID EQUAL KW_MUL LP expCol COMMA expCol RP =>(A.atr(expCol , KW_MUL , expCol, expCol ))
   
-  | %try expCol EQUAL KW_DIV LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_DIV , expCol, expCol ))
+  | %try ID EQUAL KW_DIV LP expCol COMMA expCol RP =>(A.atr(expCol , KW_DIV , expCol, expCol ))
 
-  | %try KW_INSERT LP KW_TAB COMMA expCol COMMA AP CON_string AP RP =>(Ap.atr(KW_INSERT , KW_TAB , expCol, CON_string ))
+  | %try KW_INSERT LP KW_TAB COMMA expCol COMMA AP CON_string AP RP =>(A.atr(KW_INSERT , KW_TAB , expCol, CON_string ));
+
+  | ID EQUAL 
   
 expCol
-  : KW_TAB LB AP CON_string AP RP => (Ap.tab(KW_TAB, CON_string))
-  | KW_COL =>(Ap.col(KW_COL))
+  : KW_TAB LB AP CON_string AP RP => (A.tab(KW_TAB, CON_string))
+  | KW_COL =>(A.col(KW_COL))
   ;
 
- 
-
-appExps
+ appExps
   : simpleExp+ =>
     (
       let
@@ -88,22 +84,27 @@ appExps
     )
   ;
 
+opExp
+  : %try appExps OP opExp => ( A.InfixApp(appExps, OP, opExp) )
+  | %try appExps
+;
+
 simpleExp
   : CON_int => ( A.IntConstant(CON_int) )
   | CON_string => ( A.StringConstant(CON_string) )
   | ID => ( A.Variable(ref (A.create_symbol ID)) )
-  | KW_let declist KW_in exp KW_end => ( A.LetIn(declist, exp) )
   | %try LP exp RP => ( exp )
-  | %try LP exp COMMA explist RP => ( A.Tuple(exp :: explist) )
-  | LP RP => ( A.Unit )
   ;
 
-explist
+
+
+
+(*explist
   : %try exp COMMA explist => ( exp :: explist )
   | %try exp => ( [exp] )
   ;
-
-fnArgs
+*)
+(*fnArgs
   : LP RP => ( [] )
   | LP arglist RP => ( arglist )
   | ID => ( [A.Name(ref (A.create_symbol ID))] )
@@ -131,3 +132,4 @@ valdec
 fundec
   : ID fnArgs OP exp %where ( OP = "=" ) => ( A.Valdec(A.Name(ref (A.create_symbol ID)), true, A.Fn(fnArgs, exp)) )
   ;
+*)

@@ -1,4 +1,4 @@
-%name MumlLexer;
+%name DprocLexer;
 
 
 %let digit = [0-9];
@@ -25,7 +25,7 @@
 %states CON_STRING;
 
 %defs (
-  structure T = MumlTokens
+  structure T = DprocTokens
   type lex_result = T.token
   fun eof() = T.EOF
   val stringbuf = ref "";
