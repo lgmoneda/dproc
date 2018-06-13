@@ -5,39 +5,74 @@
 );
 
 %tokens
+
   : KW_let ("let") | KW_in ("in") | KW_end ("end")
   | KW_fn ("fn") | KW_fun ("fun") | KW_val ("val")
   | KW_if ("if") | KW_then ("then") | KW_else ("else")
   | KW_andalso ("andalso") | KW_orelse ("orelse")
-  | CON_int of Int.int | CON_string of string
-  | ID of string | OP of string
+  | CON_int of Int.int | CON_string of string 
+  | ID of string | OP_UNI of string | OP_BIN of string | OP_
   | LP ("(") | RP (")") | COMMA (",") | SEMI (";")| COLON (":")
-  | LB ("[") | RB ("]")
-  | ARROW ("=>") | TARROW ("->")
+  | LB ("[") | RB ("]") | DOT (".") | CSV ("csv") | NAME ("name") | AP ("'")
+  | ARROW ("=>") | TARROW ("->") | EQUAL ("=")
   ;
 
-%start exp;
+%start programa;
 
-exp
-  : %try blockExp SEMI expsequence => ( A.Sequence(blockExp :: expsequence) )
-  | %try blockExp
+programa
+  : %try declaracao SEMI corpo => ( A.Sequence(declaracao,corpo) );
+
+declaracao
+  : %try decvariavel SEMI declaracao => ( decvariavel :: declaracao)
+  | %try decvariavel => ( [decvariavel] )
   ;
 
-expsequence
-  : %try blockExp SEMI expsequence => ( blockExp :: expsequence )
-  | %try blockExp => ( [blockExp] )
+decvariavel
+  : %try type ID  => (A.variavel(type , ID));
+
+type  
+  : %try KW_TAB => (A.tipo(KW_TAB))
+  | %try KW_COL => (A.tipo(KW_COL))
+  | %try KW_LIST => (A.tipo(KW_LIST))
+  | %try KW_STRING => (A.tipo(KW_STRING))
+  | %try KW_BOOL => (A.tipo(KW_BOOL))
+  | %try KW_FLOAT => (A.tipo(KW_FLOAT))
+  | %try KW_INT => (A.tipo(KW_INT))
   ;
 
-blockExp
-  : KW_fn fnArgs ARROW blockExp => ( A.Fn(fnArgs, blockExp) )
-  | KW_if opExp KW_then opExp KW_else opExp => ( A.IfThenElse(opExp1, opExp2, opExp3) )
-  | opExp
+corpo
+  : %try cmd SEMI corpo => ( cmd :: corpo )
+  | %try cmd SEMI => ([cmd])
   ;
 
-opExp
-  : %try appExps OP opExp => ( A.InfixApp(appExps, OP, opExp) )
-  | %try appExps
+cmd
+  : %try KW_TAB EQUAL KW_LOAD LP  AP CON_string DOT CSV AP COMMA NAME EQUAL AP CON_string AP RP =>(Ap.atr(KW_TAB, KW_LOAD, CON_string, DOT, CSV, CON_string ))
+
+  | %try KW_SAVE LP KW_TAB COMMA  AP CON_string DOT CSV AP RP =>(Ap.atr(KW_TAB, CON_string, DOT, CSV ))
+  
+  
+  | %try KW_FLOAT EQUAL KW_MAX LP expCol RP =>(Ap.atr(KW_FLOAT , KW_MAX , expCol ))
+  
+  | %try KW_FLOAT EQUAL KW_MIN LP expCol RP =>(Ap.atr(KW_FLOAT , KW_MIN , expCol ))
+  
+  | %try KW_FLOAT EQUAL KW_AVG LP expCol RP =>(Ap.atr(KW_FLOAT , KW_AVG , expCol ))
+
+  | %try expCol EQUAL KW_SOMA LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_SOMA , expCol, expCol ))
+
+  | %try expCol EQUAL KW_SUB LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_SUB , expCol, expCol ))
+
+  | %try expCol EQUAL KW_MUL LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_MUL , expCol, expCol ))
+  
+  | %try expCol EQUAL KW_DIV LP expCol COMMA expCol RP =>(Ap.atr(expCol , KW_DIV , expCol, expCol ))
+
+  | %try KW_INSERT LP KW_TAB COMMA expCol COMMA AP CON_string AP RP =>(Ap.atr(KW_INSERT , KW_TAB , expCol, CON_string ))
+  
+expCol
+  : KW_TAB LB AP CON_string AP RP => (Ap.tab(KW_TAB, CON_string))
+  | KW_COL =>(Ap.col(KW_COL))
   ;
+
+ 
 
 appExps
   : simpleExp+ =>
