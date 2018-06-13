@@ -43,28 +43,29 @@ corpo
   ;
 
 cmd
-  : %try ID EQUAL KW_LOAD LP  AP CON_string DOT CSV AP COMMA NAME EQUAL AP CON_string AP RP => (A.atr(KW_TAB, KW_LOAD, CON_string, DOT, CSV, CON_string ))
+  : %try ID EQUAL KW_LOAD expParam => (A.atr(KW_TAB, KW_LOAD, expParam))
+  | %try KW_SAVE expParam =>(A.cmd(KW_SAVE, expParam))
+  | %try KW_INSERT expParam =>(A.cmd(KW_INSERT , expParam))
+  | %try ID EQUAL KW_MAX expParam =>(A.atr(ID , KW_MAX , expParam))
+  | %try ID EQUAL KW_MIN expParam =>(A.atr(ID , KW_MIN , expParam))
+  | %try ID EQUAL KW_AVG expParam =>(A.atr(ID , KW_AVG , expParam))
+  | %try ID EQUAL KW_SOMA expParam =>(A.atr(expCol , KW_SOMA , expParam))
+  | %try ID EQUAL KW_SUB expParam  =>(A.atr(expCol , KW_SUB , expParam))
+  | %try ID EQUAL KW_MUL expParam  =>(A.atr(expCol , KW_MUL , expParam))
+  | %try ID EQUAL KW_DIV expParam  =>(A.atr(expCol , KW_DIV , expParam))
+  ;
 
-  | %try KW_SAVE LP KW_TAB COMMA  AP CON_string DOT CSV AP RP =>(A.atr(KW_TAB, CON_string, DOT, CSV ))
-  
-  | %try ID EQUAL KW_MAX LP expCol RP =>(A.atr(ID , KW_MAX , expCol ))
-  
-  | %try ID EQUAL KW_MIN LP expCol RP =>(A.atr(ID , KW_MIN , expCol ))
-  
-  | %try ID EQUAL KW_AVG LP expCol RP =>(A.atr(ID , KW_AVG , expCol ))
 
-  | %try ID EQUAL KW_SOMA LP expCol COMMA expCol RP =>(A.atr(expCol , KW_SOMA , expCol, expCol ))
 
-  | %try ID EQUAL KW_SUB LP expCol COMMA expCol RP =>(A.atr(expCol , KW_SUB , expCol, expCol ))
 
-  | %try ID EQUAL KW_MUL LP expCol COMMA expCol RP =>(A.atr(expCol , KW_MUL , expCol, expCol ))
-  
-  | %try ID EQUAL KW_DIV LP expCol COMMA expCol RP =>(A.atr(expCol , KW_DIV , expCol, expCol ))
+expParam
+  : %try LP  AP CON_string DOT CSV AP COMMA NAME EQUAL AP CON_string AP RP => (A.paramquart( CON_string, DOT, CSV, CON_string))
+  | %try  LP KW_TAB COMMA  AP CON_string DOT CSV AP RP =>(A.paramquart(KW_TAB, CON_string, DOT, CSV ))
+  | %try LP expCol RP =>(A.paramum(expCol))
+  | %try LP expCol COMMA expCol RP =>(A.paramdob(expCol, expCol))
+  | %try LP KW_TAB COMMA expCol COMMA AP CON_string AP RP =>(A.paramtre(KW_TAB , expCol, CON_string));
 
-  | %try KW_INSERT LP KW_TAB COMMA expCol COMMA AP CON_string AP RP =>(A.atr(KW_INSERT , KW_TAB , expCol, CON_string ));
 
-  | ID EQUAL 
-  
 expCol
   : KW_TAB LB AP CON_string AP RP => (A.tab(KW_TAB, CON_string))
   | KW_COL =>(A.col(KW_COL))
