@@ -1,0 +1,10 @@
+column renda;
+column renda_mensal;
+float renda_media;
+table analise_renda;
+
+renda = [200, 300, 250, 400];
+renda_media = media(renda);
+renda_mensal = divisao(renda, 12);
+
+table analise_renda = [renda, renda_media, renda_mensal];

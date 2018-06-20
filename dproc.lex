@@ -1,19 +1,37 @@
-%name MumlLexer;
+%name DprocLexer;
 
 %let digit = [0-9];
 %let int = {digit}+;
 %let letter = [a-zA-Z];
 %let id = {letter}({letter} | {digit} | "'" | "_")*;
-%let op = ("<" | ">" | "+" | "-" | "^" | "*" | "=")+;
+%let op = ("+" | "-" | "*" | "/" | "**");
+
+%let float = {int}"."{int};
+%let decl = ("int" | "float" | "bool" | "column" | "table");
+%let func = ("max" | "min" | "load" | "media" | "soma" | "subtracao" | "multiplicacao" | "divisao" | "insert" | "logic_comp");
+%let op_rel = ("<" | ">" | ">=" | "<=" | "==" | "!=");
+%let op_log = ("and" | "or");
+%let bool = ("true" | "false");
+
+
 
 %states CON_STRING;
 
 %defs (
-  structure T = MumlTokens
+  structure T = DprocTokens
   type lex_result = T.token
   fun eof() = T.EOF
   val stringbuf = ref "";
 );
+
+<INITIAL> {float} => ( T.CON_float (valOf (Real.fromString yytext)) );
+<INITIAL> {decl} => ( T.KW_decl yytext );
+<INITIAL> {func} => ( T.KW_func yytext );
+<INITIAL> teste => ( T.KW_teste );
+<INITIAL> "=" => ( T.ASSIGN );
+<INITIAL> {op_rel} => ( T.OP_rel yytext);
+<INITIAL> {op_log} => ( T.OP_log yytext);
+<INITIAL> {bool} => (T.CON_bool (valOf (Bool.fromString yytext)) );
 
 <INITIAL> let => ( T.KW_let );
 <INITIAL> in => ( T.KW_in );

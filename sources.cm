@@ -1,6 +1,6 @@
 Library
-  structure MumlLexer
-  structure MumlTokens
+  structure DprocLexer
+  structure DprocTokens
   structure Ast
   structure Helpers
   structure SymbolAnalysis
@@ -10,8 +10,8 @@ is
   $/basis.cm
   $/smlnj-lib.cm
   $/ml-lpt-lib.cm
-  muml.grm : ml-antlr
-  muml.lex : ml-ulex
+  dproc.grm : ml-antlr
+  dproc.lex : ml-ulex
   int_map.sml
   symbol_map.sml
   string_map.sml
