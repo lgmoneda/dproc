@@ -46,12 +46,12 @@ expsequence
 
 blockExp
   (*: KW_fn fnArgs ARROW blockExp => ( A.Fn(fnArgs, blockExp) )*)
-  : KW_if opExp KW_then blockCmd KW_else blockCmd => ( A.IfThenElse(opExp, blockCmd1, blockCmd2) )
-  | opExp
+  : opExp
   ;
 
 blockCmd
-  : ID ASSIGN opExp => ( A.Assign(A.Variable(ref (A.create_symbol ID)), opExp) )
+  : ID ASSIGN opExp => ( A.Assign(ID, opExp) )
+  | KW_if opExp KW_then blockCmd KW_else blockCmd => ( A.IfThenElse(opExp, blockCmd1, blockCmd2) )
   ;
 
 cmdSequence
@@ -94,9 +94,10 @@ appExps
 
 simpleExp
   : CON_int => ( A.IntConstant(CON_int) )
+  | CON_float => ( A.FloatConstant(CON_float) )
   | CON_bool => ( A.BoolConstant(CON_bool) )
   | CON_string => ( A.StringConstant(CON_string) )
-  | ID => ( A.Variable(ref (A.create_symbol ID)) )
+  | ID => ( A.VarRef(ID) )
   (*| KW_let declist KW_in exp KW_end => ( A.LetIn(declist, exp) )*)
   | %try LP exp RP => ( exp )
   | %try LB blockExp COMMA explist RB => ( A.Tuple(blockExp :: explist) )

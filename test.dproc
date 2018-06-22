@@ -1,10 +1,7 @@
-column renda;
-column renda_mensal;
-float renda_media;
-table analise_renda;
+int a;
+int b;
 
-renda = [200, 300, 250, 400];
-renda_media = media(renda);
-renda_mensal = divisao(renda, 12);
-
-table analise_renda = [renda, renda_media, renda_mensal];
+a = 5;
+b = a + 2;
+c = ["renda", [1,2]];
+d = 5.2;

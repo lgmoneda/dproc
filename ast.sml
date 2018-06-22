@@ -10,6 +10,7 @@ Ast = struct
 
   datatype Exp =
       IntConstant of int
+    | FloatConstant of real
     | StringConstant of string
     | BoolConstant of bool
     | Unit
@@ -26,8 +27,9 @@ Ast = struct
     | Fn of Arg list * Exp
     | Valdec of Arg * bool * Exp
     | VarDec of string * Exp
+    | VarRef of string
     | FuncExp of string * Exp list
-    | Assign of Exp * Exp
+    | Assign of string * Exp
     | LogApp of Exp * string * Exp
     | RelApp of Exp * string * Exp
     ;
@@ -36,6 +38,7 @@ Ast = struct
     | String_v of string
     | Float_v of real
     | Bool_v of bool
+    | List of Value list
     | LookupError
     | EndList
     ;
@@ -178,27 +181,7 @@ Ast = struct
           (if recursive then "fun " else "val ") ^ toString_arg(name) ^ " = " ^ (parenthise body)
     end
 
-    fun eval(e:Exp):Value =
-      case e of
-        IntConstant i => Int_v i  |
-        StringConstant s => String_v s |
-        BoolConstant b => Bool_v b |
-        InfixApp(e1, s, e2) => eval_binop(eval(e1), s, eval(e2))
 
-    and eval_binop(v1:Value, s:string, v2:Value):Value =
-      case (v1, s, v2) of
-        (Int_v i1, "+", Int_v i2) => Int_v(i1+i2) |
-        (Int_v i1, "-", Int_v i2) => Int_v(i1-i2) |
-        (Int_v i1, "*", Int_v i2) => Int_v(i1*i2) |
-        (Int_v i1, "/", Int_v i2) => Int_v(i1 div i2) |
-        (Int_v i1, ">", Int_v i2) => Bool_v(i1 > i2) |
-        (Int_v i1, ">=", Int_v i2) => Bool_v(i1 >= i2) |
-        (Int_v i1, "<", Int_v i2) => Bool_v(i1 < i2) |
-        (Int_v i1, "<=", Int_v i2) => Bool_v(i1 <= i2) |
-        (Int_v i1, "==", Int_v i2) => Bool_v(i1 = i2) |
-        (Int_v i1, "!=", Int_v i2) => Bool_v(i1 <> i2) |
-        
-        (String_v s1, "+", String_v s2) => String_v(s1 ^ s2)
         
 
 (*      and process(e:Exp):Value =
