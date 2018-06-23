@@ -103,7 +103,8 @@ fun eval(e:Ast.Exp):Ast.Value =
     		"divisao" => divisao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
     		"max" => maximo(extractListVal(eval(List.nth(args,0)))) |
     		"min" => minimo(extractListVal(eval(List.nth(args,0)))) |
-    		"media" => media(extractListVal(eval(List.nth(args,0))))
+    		"media" => media(extractListVal(eval(List.nth(args,0)))) |
+    		"logic_comp" => logic_comp(eval(List.nth(args,0)), eval(List.nth(args,1)), eval(List.nth(args,2)), eval(List.nth(args,3)), eval(List.nth(args,4)))
 
 	
 	and soma(c1:Ast.Value, c2:Ast.Value):Ast.Value =
@@ -152,6 +153,13 @@ fun eval(e:Ast.Exp):Ast.Value =
 
 	and sum (h::t : Ast.Value list) = eval_binop(intToFloat(h), "+", sum(t)) |
 		sum(nil) = Ast.Float_v(0.0)
+
+	and logic_comp(v1:Ast.Value, s:Ast.Value, v2:Ast.Value, v3:Ast.Value, v4:Ast.Value) = 
+		case s of
+			Ast.String_v p =>
+		Ast.List(ListPair.map (fn (x, y) => eval_logic_comp(x, p, y, v3, v4) ) (extractListVal(v1), extractListVal(v2)))
+
+	and eval_logic_comp(v1, s, v2, v3, v4) = if isBoolTrue(eval_relapp(v1, s, v2)) then v3 else v4
 
     and processCmd (cmd:Ast.Exp) = 
 		case cmd of
