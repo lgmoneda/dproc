@@ -22,14 +22,6 @@
 
 %start exp;
 
-(*exp
-  : %try declSequence expsequence SEMI => ( A.Sequence(declSequence @ expsequence ))
-  | %try blockExp SEMI expsequence  SEMI => ( A.Sequence(blockExp :: expsequence) )
-  | %try blockExp SEMI
-  | %try blockDecl declSequence => ( A.Sequence(blockDecl :: declSequence) )
-  | blockDecl => ( blockDecl )
-  ;*)
-
 exp
   : %try declSequence cmdSequence SEMI => ( A.Sequence(declSequence @ cmdSequence ))
   | %try blockCmd SEMI cmdSequence  SEMI => ( A.Sequence(blockCmd :: cmdSequence) )
@@ -45,7 +37,6 @@ expsequence
   ;
 
 blockExp
-  (*: KW_fn fnArgs ARROW blockExp => ( A.Fn(fnArgs, blockExp) )*)
   : opExp
   ;
 
@@ -98,7 +89,6 @@ simpleExp
   | CON_bool => ( A.BoolConstant(CON_bool) )
   | CON_string => ( A.StringConstant(CON_string) )
   | ID => ( A.VarRef(ID) )
-  (*| KW_let declist KW_in exp KW_end => ( A.LetIn(declist, exp) )*)
   | %try LP exp RP => ( exp )
   | %try LB blockExp COMMA explist RB => ( A.Tuple(blockExp :: explist) )
   | LP RP => ( A.Unit )
@@ -118,33 +108,3 @@ func_args
   : %try LP blockExp COMMA explist RP => ( blockExp :: explist )
   | %try LP blockExp RP => ( [blockExp] )
   ;
-
-
-(*fnArgs
-  : LP RP => ( [] )
-  | LP arglist RP => ( arglist )
-  | ID => ( [A.Name(ref (A.create_symbol ID))] )
-  ;
-
-arglist
-  : %try ID COMMA arglist => ( A.Name(ref (A.create_symbol ID)) :: arglist )
-  | %try ID => ( [A.Name(ref (A.create_symbol ID))] )
-  ;
-
-declist
-  : %try dec SEMI declist => ( dec :: declist )
-  | %try dec => ( [dec] )
-  ;
-
-dec
-  : KW_val valdec
-  : KW_fun fundec
-  ;
-
-(*valdec
-  : ID OP exp %where ( OP = "=" ) => ( A.Valdec(A.Name(ref (A.create_symbol ID)), false, exp) )
-  ;*)
-
-(*fundec
-  : ID fnArgs OP exp %where ( OP = "=" ) => ( A.Valdec(A.Name(ref (A.create_symbol ID)), true, A.Fn(fnArgs, exp)) )
-  ;*)

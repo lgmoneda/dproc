@@ -179,18 +179,6 @@ Ast = struct
       | Fn(args, body) => "fn(" ^ (toString_list "," toString_arg args) ^ ") => " ^ (parenthise body)
       | Valdec(name, recursive, body) =>
           (if recursive then "fun " else "val ") ^ toString_arg(name) ^ " = " ^ (parenthise body)
-    end
-
-
-        
-
-(*      and process(e:Exp):Value =
-        case e of
-          Sequence t => eval(hd(t)) |
-          IntConstant i => eval(IntConstant i) |
-          VarDec(id, exp) => store(id, eval(exp))
-
-      and store(label, exp) = (record := [(label, exp)] @ !record);
-      ;*);
+    end;
 
 end

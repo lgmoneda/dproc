@@ -102,7 +102,8 @@ fun eval(e:Ast.Exp):Ast.Value =
     		"multiplicacao" => multiplicacao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
     		"divisao" => divisao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
     		"max" => maximo(extractListVal(eval(List.nth(args,0)))) |
-    		"min" => minimo(extractListVal(eval(List.nth(args,0))))
+    		"min" => minimo(extractListVal(eval(List.nth(args,0)))) |
+    		"media" => media(extractListVal(eval(List.nth(args,0))))
 
 	
 	and soma(c1:Ast.Value, c2:Ast.Value):Ast.Value =
@@ -147,6 +148,11 @@ fun eval(e:Ast.Exp):Ast.Value =
 		        if isBoolTrue(eval_relapp(x, "<", y)) then x else y
 		      end
 
+	and media(l: Ast.Value list) = eval_binop(sum(l), "/", Ast.Float_v(Real.fromInt(length(l)))) 
+
+	and sum (h::t : Ast.Value list) = eval_binop(intToFloat(h), "+", sum(t)) |
+		sum(nil) = Ast.Float_v(0.0)
+
     and processCmd (cmd:Ast.Exp) = 
 		case cmd of
 			Ast.VarDec(ID, exp) => insert(ID, eval(exp)) |
@@ -157,6 +163,11 @@ fun eval(e:Ast.Exp):Ast.Value =
 		case b of
 			Ast.Bool_v true => true |
 			Ast.Bool_v false => false
+
+	and intToFloat(i) =
+		case i of
+			Ast.Int_v f => Ast.Float_v(Real.fromInt(f)) |
+			Ast.Float_v f => Ast.Float_v f
 
 	and check_list_type(vallist:Ast.Value) =
 		case hd(extractListVal(vallist)) of
@@ -173,4 +184,4 @@ val arvore_sintatica = makeTest(input);
 
 val cmds = extractList(arvore_sintatica);
 
-val results = map processCmd cmds; 
+app processCmd cmds; 
