@@ -1,7 +1,9 @@
 column a;
 column b;
 column c;
+int d;
 
-a = [2,3];
+a = [2.2,3.3];
 b = [1,1];
-c = soma(a, b);
+d = 2;
+c = subtracao(a, 1.1);

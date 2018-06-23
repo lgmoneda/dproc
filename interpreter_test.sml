@@ -66,16 +66,40 @@ fun eval(e:Ast.Exp):Ast.Value =
         (Ast.Int_v i1, "<=", Ast.Int_v i2) => Ast.Bool_v(i1 <= i2) |
         (Ast.Int_v i1, "==", Ast.Int_v i2) => Ast.Bool_v(i1 = i2) |
         (Ast.Int_v i1, "!=", Ast.Int_v i2) => Ast.Bool_v(i1 <> i2) |
+
+        (Ast.Float_v f1, "+", Ast.Float_v f2) => Ast.Float_v(f1+f2) |
+        (Ast.Float_v f1, "-", Ast.Float_v f2) => Ast.Float_v(f1-f2) |
+        (Ast.Float_v f1, "*", Ast.Float_v f2) => Ast.Float_v(f1*f2) |
+        (Ast.Float_v f1, "/", Ast.Float_v f2) => Ast.Float_v(f1 / f2) |
+        (Ast.Float_v f1, ">", Ast.Float_v f2) => Ast.Bool_v(f1 > f2) |
+        (Ast.Float_v f1, ">=", Ast.Float_v f2) => Ast.Bool_v(f1 >= f2) |
+        (Ast.Float_v f1, "<", Ast.Float_v f2) => Ast.Bool_v(f1 < f2) |
+        (Ast.Float_v f1, "<=", Ast.Float_v f2) => Ast.Bool_v(f1 <= f2) |
+        (Ast.Float_v f1, "==", Ast.Float_v f2) => Ast.Bool_v(Real.==(f1, f2)) |
+        (Ast.Float_v f1, "!=", Ast.Float_v f2) => Ast.Bool_v(Real.!=(f1, f2)) |
+
         (Ast.String_v s1, "+", Ast.String_v s2) => Ast.String_v(s1 ^ s2)
 
     and apply_func(f, args) =
     	case f of
-    		"soma" => soma(eval(List.nth(args,0)), eval(List.nth(args,1)))
+    		"soma" => soma(eval(List.nth(args,0)), eval(List.nth(args,1))) |
+    		"subtracao" => subtracao(eval(List.nth(args,0)), eval(List.nth(args,1)))
 
-    and eval_soma(a, b) = eval_binop(a, "+", b)
+    (*and eval_soma(a, b) = eval_binop(a, "+", b)*)
 	
 	and soma(c1:Ast.Value, c2:Ast.Value):Ast.Value =
-		Ast.List(ListPair.map eval_soma (extractListVal(c1), extractListVal(c2)))
+		case c2 of
+			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "+", y) ) (extractListVal(c1), c2)) |
+			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "+", Ast.Int_v i) ) (extractListVal(c1))) |
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "+", Ast.Float_v f) ) (extractListVal(c1)))
+
+	and subtracao(c1:Ast.Value, c2:Ast.Value):Ast.Value =
+		case c2 of
+			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "-", y) ) (extractListVal(c1), c2)) |
+			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "-", Ast.Int_v i) ) (extractListVal(c1))) |
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "-", Ast.Float_v f) ) (extractListVal(c1)))
+
+
 
     and processCmd (cmd:Ast.Exp) = 
 		case cmd of
