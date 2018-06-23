@@ -1,12 +1,7 @@
-column renda;
-column renda_mensal;
-column renda_abaixo_media;
-float renda_media;
-table analise_renda;
+column a;
+column b;
+column c;
 
-renda = [200, 300, 250, 400];
-renda_media = media(renda);
-renda_abaixo_media = logic_comp(renda, renda_media)
-renda_mensal = divisao(renda, 12);
-
-table analise_renda = [renda, renda_abaixo_media, renda_mensal];
+a = [2,3];
+b = [1,1];
+c = soma(a, b);

@@ -39,6 +39,10 @@ fun extractList (seq:Ast.Exp):Ast.Exp list =
 	case seq of 
 	Ast.Sequence i => i;
 
+fun extractListVal(vallist:Ast.Value) =
+	case vallist of
+		Ast.List l => l
+
 fun eval(e:Ast.Exp):Ast.Value =
       case e of
         Ast.IntConstant i => Ast.Int_v i  |
@@ -47,7 +51,8 @@ fun eval(e:Ast.Exp):Ast.Value =
         Ast.BoolConstant b => Ast.Bool_v b |
         Ast.Tuple explist => Ast.List(map eval explist) |
         Ast.InfixApp(e1, s, e2) => eval_binop(eval(e1), s, eval(e2)) |
-        Ast.VarRef(s) => look_up(s, !record)
+        Ast.VarRef(s) => look_up(s, !record) |
+        Ast.FuncExp(f, args) => apply_func(f, args)
 
     and eval_binop(v1:Ast.Value, s:string, v2:Ast.Value):Ast.Value =
       case (v1, s, v2) of
@@ -63,12 +68,26 @@ fun eval(e:Ast.Exp):Ast.Value =
         (Ast.Int_v i1, "!=", Ast.Int_v i2) => Ast.Bool_v(i1 <> i2) |
         (Ast.String_v s1, "+", Ast.String_v s2) => Ast.String_v(s1 ^ s2)
 
+    and apply_func(f, args) =
+    	case f of
+    		"soma" => soma(eval(List.nth(args,0)), eval(List.nth(args,1)))
+
+    and eval_soma(a, b) = eval_binop(a, "+", b)
+	
+	and soma(c1:Ast.Value, c2:Ast.Value):Ast.Value =
+		Ast.List(ListPair.map eval_soma (extractListVal(c1), extractListVal(c2)))
+
     and processCmd (cmd:Ast.Exp) = 
 		case cmd of
 			Ast.VarDec(ID, exp) => insert(ID, eval(exp)) |
-			Ast.Assign(ID, exp) => insert(ID, eval(exp));
+			Ast.Assign(ID, exp) => insert(ID, eval(exp))
 
-
+	and check_list_type(vallist:Ast.Value) =
+		case hd(extractListVal(vallist)) of
+			Ast.Int_v i => "int" |
+			Ast.Float_v f => "float" |
+			Ast.String_v s => "string" |
+			Ast.Bool_v b => "bool";
 
 val input = concat(readlist("test.dproc"));
 
