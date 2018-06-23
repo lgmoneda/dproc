@@ -1,9 +1,2 @@
-column a;
-column b;
-column c;
-int d;
-
-a = [2.2,3.3];
-b = [1,1];
-d = 2;
-c = subtracao(a, 1.1);
+if 2 > 3 then x=2 else y=3;
+if 3>2 then w=4 else z=1;

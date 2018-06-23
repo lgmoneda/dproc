@@ -51,6 +51,7 @@ fun eval(e:Ast.Exp):Ast.Value =
         Ast.BoolConstant b => Ast.Bool_v b |
         Ast.Tuple explist => Ast.List(map eval explist) |
         Ast.InfixApp(e1, s, e2) => eval_binop(eval(e1), s, eval(e2)) |
+        Ast.RelApp(e1, s, e2) => eval_relapp(eval(e1), s, eval(e2)) |
         Ast.VarRef(s) => look_up(s, !record) |
         Ast.FuncExp(f, args) => apply_func(f, args)
 
@@ -60,17 +61,23 @@ fun eval(e:Ast.Exp):Ast.Value =
         (Ast.Int_v i1, "-", Ast.Int_v i2) => Ast.Int_v(i1-i2) |
         (Ast.Int_v i1, "*", Ast.Int_v i2) => Ast.Int_v(i1*i2) |
         (Ast.Int_v i1, "/", Ast.Int_v i2) => Ast.Int_v(i1 div i2) |
-        (Ast.Int_v i1, ">", Ast.Int_v i2) => Ast.Bool_v(i1 > i2) |
+
+        (Ast.Float_v f1, "+", Ast.Float_v f2) => Ast.Float_v(f1+f2) |
+        (Ast.Float_v f1, "-", Ast.Float_v f2) => Ast.Float_v(f1-f2) |
+        (Ast.Float_v f1, "*", Ast.Float_v f2) => Ast.Float_v(f1*f2) |
+        (Ast.Float_v f1, "/", Ast.Float_v f2) => Ast.Float_v(f1 / f2) |
+        
+        (Ast.String_v s1, "+", Ast.String_v s2) => Ast.String_v(s1 ^ s2)
+
+    and eval_relapp(v1:Ast.Value, s:string, v2:Ast.Value):Ast.Value = 
+      case (v1, s, v2) of
+      	(Ast.Int_v i1, ">", Ast.Int_v i2) => Ast.Bool_v(i1 > i2) |
         (Ast.Int_v i1, ">=", Ast.Int_v i2) => Ast.Bool_v(i1 >= i2) |
         (Ast.Int_v i1, "<", Ast.Int_v i2) => Ast.Bool_v(i1 < i2) |
         (Ast.Int_v i1, "<=", Ast.Int_v i2) => Ast.Bool_v(i1 <= i2) |
         (Ast.Int_v i1, "==", Ast.Int_v i2) => Ast.Bool_v(i1 = i2) |
         (Ast.Int_v i1, "!=", Ast.Int_v i2) => Ast.Bool_v(i1 <> i2) |
 
-        (Ast.Float_v f1, "+", Ast.Float_v f2) => Ast.Float_v(f1+f2) |
-        (Ast.Float_v f1, "-", Ast.Float_v f2) => Ast.Float_v(f1-f2) |
-        (Ast.Float_v f1, "*", Ast.Float_v f2) => Ast.Float_v(f1*f2) |
-        (Ast.Float_v f1, "/", Ast.Float_v f2) => Ast.Float_v(f1 / f2) |
         (Ast.Float_v f1, ">", Ast.Float_v f2) => Ast.Bool_v(f1 > f2) |
         (Ast.Float_v f1, ">=", Ast.Float_v f2) => Ast.Bool_v(f1 >= f2) |
         (Ast.Float_v f1, "<", Ast.Float_v f2) => Ast.Bool_v(f1 < f2) |
@@ -78,12 +85,22 @@ fun eval(e:Ast.Exp):Ast.Value =
         (Ast.Float_v f1, "==", Ast.Float_v f2) => Ast.Bool_v(Real.==(f1, f2)) |
         (Ast.Float_v f1, "!=", Ast.Float_v f2) => Ast.Bool_v(Real.!=(f1, f2)) |
 
-        (Ast.String_v s1, "+", Ast.String_v s2) => Ast.String_v(s1 ^ s2)
+        (Ast.Bool_v true, "and", Ast.Bool_v true) => Ast.Bool_v(true) |
+        (Ast.Bool_v true, "and", Ast.Bool_v false) => Ast.Bool_v(false) |
+        (Ast.Bool_v false, "and", Ast.Bool_v true) => Ast.Bool_v(false) |
+        (Ast.Bool_v false, "and", Ast.Bool_v false) => Ast.Bool_v(false) |
+        (Ast.Bool_v true, "or", Ast.Bool_v true) => Ast.Bool_v(true) |
+        (Ast.Bool_v true, "or", Ast.Bool_v false) => Ast.Bool_v(true) |
+        (Ast.Bool_v false, "or", Ast.Bool_v true) => Ast.Bool_v(true) |
+        (Ast.Bool_v false, "or", Ast.Bool_v false) => Ast.Bool_v(false)
+
 
     and apply_func(f, args) =
     	case f of
     		"soma" => soma(eval(List.nth(args,0)), eval(List.nth(args,1))) |
-    		"subtracao" => subtracao(eval(List.nth(args,0)), eval(List.nth(args,1)))
+    		"subtracao" => subtracao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
+    		"multiplicacao" => multiplicacao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
+    		"divisao" => divisao(eval(List.nth(args,0)), eval(List.nth(args,1)))
 
     (*and eval_soma(a, b) = eval_binop(a, "+", b)*)
 	
@@ -99,12 +116,28 @@ fun eval(e:Ast.Exp):Ast.Value =
 			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "-", Ast.Int_v i) ) (extractListVal(c1))) |
 			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "-", Ast.Float_v f) ) (extractListVal(c1)))
 
+	and multiplicacao(c1:Ast.Value, c2:Ast.Value):Ast.Value =
+		case c2 of
+			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "*", y) ) (extractListVal(c1), c2)) |
+			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "*", Ast.Int_v i) ) (extractListVal(c1))) |
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "*", Ast.Float_v f) ) (extractListVal(c1)))
 
+	and divisao(c1:Ast.Value, c2:Ast.Value):Ast.Value =
+		case c2 of
+			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "/", y) ) (extractListVal(c1), c2)) |
+			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "/", Ast.Int_v i) ) (extractListVal(c1))) |
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "/", Ast.Float_v f) ) (extractListVal(c1)))
 
     and processCmd (cmd:Ast.Exp) = 
 		case cmd of
 			Ast.VarDec(ID, exp) => insert(ID, eval(exp)) |
-			Ast.Assign(ID, exp) => insert(ID, eval(exp))
+			Ast.Assign(ID, exp) => insert(ID, eval(exp)) |
+			Ast.IfThenElse(e, cmd1, cmd2) => if isBoolTrue(eval(e)) = true then processCmd(cmd1) else processCmd(cmd2)
+
+	and isBoolTrue(b) = 
+		case b of
+			Ast.Bool_v true => true |
+			Ast.Bool_v false => false
 
 	and check_list_type(vallist:Ast.Value) =
 		case hd(extractListVal(vallist)) of
