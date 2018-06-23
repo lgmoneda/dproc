@@ -1,2 +1,10 @@
-if 2 > 3 then x=2 else y=3;
-if 3>2 then w=4 else z=1;
+column x;
+column y;
+int x;
+
+x = [2,3];
+y = [5.2,7.7];
+a = max(x);
+b = max(y);
+c = min(x);
+d = min(y);

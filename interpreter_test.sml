@@ -100,9 +100,10 @@ fun eval(e:Ast.Exp):Ast.Value =
     		"soma" => soma(eval(List.nth(args,0)), eval(List.nth(args,1))) |
     		"subtracao" => subtracao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
     		"multiplicacao" => multiplicacao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
-    		"divisao" => divisao(eval(List.nth(args,0)), eval(List.nth(args,1)))
+    		"divisao" => divisao(eval(List.nth(args,0)), eval(List.nth(args,1))) |
+    		"max" => maximo(extractListVal(eval(List.nth(args,0)))) |
+    		"min" => minimo(extractListVal(eval(List.nth(args,0))))
 
-    (*and eval_soma(a, b) = eval_binop(a, "+", b)*)
 	
 	and soma(c1:Ast.Value, c2:Ast.Value):Ast.Value =
 		case c2 of
@@ -127,6 +128,24 @@ fun eval(e:Ast.Exp):Ast.Value =
 			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "/", y) ) (extractListVal(c1), c2)) |
 			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "/", Ast.Int_v i) ) (extractListVal(c1))) |
 			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "/", Ast.Float_v f) ) (extractListVal(c1)))
+
+	and maximo [] = raise Empty 
+ 		| maximo [x:Ast.Value] = x
+ 		| maximo (x::xs : Ast.Value list) =
+		    let 
+		        val y = maximo xs
+		      in
+		        if isBoolTrue(eval_relapp(x, ">", y)) then x else y
+		      end
+
+	and minimo [] = raise Empty 
+ 		| minimo [x:Ast.Value] = x
+ 		| minimo (x::xs : Ast.Value list) =
+		    let 
+		        val y = minimo xs
+		      in
+		        if isBoolTrue(eval_relapp(x, "<", y)) then x else y
+		      end
 
     and processCmd (cmd:Ast.Exp) = 
 		case cmd of
@@ -154,4 +173,4 @@ val arvore_sintatica = makeTest(input);
 
 val cmds = extractList(arvore_sintatica);
 
-val results = map processCmd cmds;
+val results = map processCmd cmds; 
