@@ -209,7 +209,21 @@ val arvore_sintatica = getArvoreSintatica(input);
 val cmds = extractList(arvore_sintatica);
 app processCmd cmds;*)
 
-fun makeTest(input:string) = let val _ = reset_record() in
+fun makeTest(input:string) =
+    let
+	val _ = reset_record()
+    in
 	app processCmd (extractList(getArvoreSintatica(concat(readlist(input)))))
-end;
+    end;
+
+fun write_file(outFile: string, list: string list) =
+    let
+	val outStream = TextIO.openOut outFile
+	fun out(xs: string list) =
+	    case xs of
+		[] => (TextIO.closeOut outStream)
+	      | x::xs' => (TextIO.output(outStream, x ^ "\r\n"); out(xs'))
+    in
+	out(list)
+    end;
 
