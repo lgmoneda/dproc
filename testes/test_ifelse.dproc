@@ -1,0 +1,7 @@
+column renda;
+bool flag;
+float avg;
+
+renda = [200, 350, 320, 150];
+avg = media(renda);
+if avg > 250.0 then flag = true else flag = false;

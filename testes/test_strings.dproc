@@ -1,0 +1,15 @@
+column a;
+column b;
+column result;
+column result2;
+string d;
+
+d = "!";
+
+a = ["Ola, ", "e ", "teste ", "linguagem "];
+b = ["esse ", "um ", "da ", "DPROC!"];
+
+result = soma(a, b);
+
+result2 = ["oi", "tchau"];
+result2 = soma(result2, d);

@@ -1,0 +1,108 @@
+%name Dproc;
+
+%defs (
+  structure A = Ast
+);
+
+%tokens
+    KW_if ("if") | KW_then ("then") | KW_else ("else")
+  | CON_int of Int.int | CON_string of string
+  | ID of string | OP of string
+  | LP ("(") | RP (")") | COMMA (",") | SEMI (";")
+  | LB ("[") | RB ("]")
+  | CON_float of real | KW_decl of string | KW_func of string | KW_teste ("teste") | ASSIGN ("=") | OP_rel of string | OP_log of string
+  | CON_bool of bool
+  ;
+
+%start program;
+
+program
+  : %try declSequence cmdSequence SEMI => ( A.Sequence(declSequence @ cmdSequence ))
+  | %try blockCmd SEMI cmdSequence  SEMI => ( A.Sequence(blockCmd :: cmdSequence) )
+  | %try blockExp SEMI
+  | %try blockDecl declSequence => ( A.Sequence(blockDecl :: declSequence) )
+  | %try blockCmd SEMI
+  | blockDecl => ( blockDecl )
+  ;
+
+expsequence
+  : %try blockExp SEMI expsequence => ( blockExp :: expsequence )
+  | %try blockExp => ( [blockExp] )
+  ;
+
+blockExp
+  : opExp
+  ;
+
+blockCmd
+  : ID ASSIGN opExp => ( A.Assign(ID, opExp) )
+  | KW_if opExp KW_then blockCmd KW_else blockCmd => ( A.IfThenElse(opExp, blockCmd1, blockCmd2) )
+  ;
+
+cmdSequence
+  : %try blockCmd SEMI cmdSequence => ( blockCmd :: cmdSequence)
+  | %try blockCmd => ( [blockCmd] )
+  ;
+
+
+declSequence
+  : %try blockDecl declSequence => ( blockDecl :: declSequence )
+  | %try blockDecl => ( [blockDecl] )
+  ;
+
+  blockDecl
+  : %try KW_decl ID SEMI %where ( KW_decl = "int" ) => ( A.VarDec(ID, A.IntConstant(0)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "float" ) => ( A.VarDec(ID, A.FloatConstant(0.0)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "bool" ) => ( A.VarDec(ID, A.BoolConstant(false)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "string" ) => ( A.VarDec(ID, A.StringConstant("")) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "column" ) => ( A.VarDec(ID, A.IntConstant(0)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "table" ) => ( A.VarDec(ID, A.IntConstant(0)) )
+  ;
+
+
+opExp
+  : %try appExps OP opExp => ( A.InfixApp(appExps, OP, opExp) )
+  | %try appExps OP_rel opExp => ( A.RelApp(appExps, OP_rel, opExp) )
+  | %try appExps OP_log opExp => ( A.RelApp(appExps, OP_log, opExp) )
+  | %try appExps
+  | %try func_apply
+  ;
+
+appExps
+  : simpleExp+ =>
+    (
+      let
+        fun apps(result, nil) = result
+          | apps(result, hd :: tl) = A.App(apps(hd, tl), result)
+
+        val simpleExpRev = List.rev simpleExp
+      in
+        apps(List.hd simpleExpRev, List.tl simpleExpRev)
+      end
+    )
+  ;
+
+simpleExp
+  : CON_int => ( A.IntConstant(CON_int) )
+  | CON_float => ( A.FloatConstant(CON_float) )
+  | CON_bool => ( A.BoolConstant(CON_bool) )
+  | CON_string => ( A.StringConstant(CON_string) )
+  | ID => ( A.VarRef(ID) )
+  | %try LP simpleExp RP => ( simpleExp )
+  | %try LB blockExp COMMA explist RB => ( A.Tuple(blockExp :: explist) )
+  ;
+
+explist
+  : %try blockExp COMMA explist => ( blockExp :: explist )
+  | %try blockExp => ( [blockExp] )
+  ;
+
+
+func_apply
+  : %try KW_func func_args => ( A.FuncExp(KW_func, func_args) )
+  ;
+
+func_args
+  : %try LP blockExp COMMA explist RP => ( blockExp :: explist )
+  | %try LP blockExp RP => ( [blockExp] )
+  ;
