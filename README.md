@@ -6,11 +6,11 @@ Dproc programming language compiler
 1. [About](#about)
 2. [File structure](#file-structure)
 3. [User manual](#user-manual)
-  1. [Install](#install)
-  2. [Variable definition](#var-def)
-  3. [Built-in functions](#builtin-func)
-  4. [Running a dproc file](#run)
-  5. [Analysing results](#results)
+    1. [Install](#install)
+    2. [Variable definition](#var-def)
+    3. [Built-in functions](#builtin-func)
+    4. [Running a dproc file](#run)
+    5. [Analysing results](#results)
 4. [Examples](#examples)
 
 ### About
