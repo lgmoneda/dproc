@@ -44,7 +44,7 @@ brew update
 brew install smlnj
 ```
 
-#### Bultin Functions
+#### Builtin Functions
 
 - Arithmetic: sum (+), subtraction (-), product (*) and division (/);
 - Logical: greater (>), greater or equal (>=), less (<), less or equal (<=), equal (==) and different (!-);
@@ -62,44 +62,57 @@ It's going to be executed and it will generate a log file called `my_program.log
 
 ### Examples
 
-``` 
-table tab;
-column comp;
-column monthly_income;
-column monthly_income_percapita;
-float average_income;
+``` sml
+column a;
+column b;
+column c;
+column d;
 
-tab = load("data.csv", name="Demographic data");
+a = [5, 1, 2, 4, 3];
+b = [2, 2, 1, 1, 2];
 
-average_income = avg(tab["Income"]);
-comp = logic_comp(tab["renda"], >, average_income, 1, 0);
-
-monthly_income = div(tab["Income"], 12);
-
-insert(tab, monthly_income, "Monthly Income");
-insert(tab, comp, "Comp to avg income");
-
-monthly_income_percapita = div(tab["Monthly Income"], tab["Family Size"]);
-
-insert(tab, monthly_income_percapita, "Monthly Income percapita");
-
-sav(tab, "data_processed.csv", "data_processed.log")
+c = multiplicacao(b, 2);
+d = logic_comp(a, ">", c, 1, 0);
 ```
 
-The log would be:
+<!-- ```  -->
+<!-- table tab; -->
+<!-- column comp; -->
+<!-- column monthly_income; -->
+<!-- column monthly_income_percapita; -->
+<!-- float average_income; -->
 
-``` 
----> "Monthly Income":
-     1. Division of the column ["Income"] from ["Demographic data"] by [12];
+<!-- tab = load("data.csv", name="Demographic data"); -->
+
+<!-- average_income = avg(tab["Income"]); -->
+<!-- comp = logic_comp(tab["renda"], >, average_income, 1, 0); -->
+
+<!-- monthly_income = div(tab["Income"], 12); -->
+
+<!-- insert(tab, monthly_income, "Monthly Income"); -->
+<!-- insert(tab, comp, "Comp to avg income"); -->
+
+<!-- monthly_income_percapita = div(tab["Monthly Income"], tab["Family Size"]); -->
+
+<!-- insert(tab, monthly_income_percapita, "Monthly Income percapita"); -->
+
+<!-- sav(tab, "data_processed.csv", "data_processed.log") -->
+<!-- ``` -->
+
+<!-- The log would be: -->
+
+<!-- ```  -->
+<!-- --\-> "Monthly Income": -->
+<!--      1. Division of the column ["Income"] from ["Demographic data"] by [12]; -->
 	 
----> "Comp to avg income": 
-     1. Logic operation [>] between column ["Income"] from ["Demographic data"] and [average of the column ["Income"] from ["Demographic Data"]], [1] if true, [0] otherwise;
+<!-- --\-> "Comp to avg income":  -->
+<!--      1. Logic operation [>] between column ["Income"] from ["Demographic data"] and [average of the column ["Income"] from ["Demographic Data"]], [1] if true, [0] otherwise; -->
 
----> "Monthy Income percapita":
-     1. Division of the column ["Monthly Income"] from ["Demographic Data"] by the column ["Family Size"] from ["Demographic data"];
-```
+<!-- --\-> "Monthy Income percapita": -->
+<!--      1. Division of the column ["Monthly Income"] from ["Demographic Data"] by the column ["Family Size"] from ["Demographic data"]; -->
+<!-- ``` -->
 
 
 ### References
 
-[SML Language Processing Tools User Guide])(https://www.smlnj.org/doc/ml-lpt/manual.pdf)
+[SML Language Processing Tools User Guide](https://www.smlnj.org/doc/ml-lpt/manual.pdf).
