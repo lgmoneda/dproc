@@ -7,7 +7,7 @@
 %let op = ("+" | "-" | "*" | "/" | "**");
 
 %let float = {int}"."{int};
-%let decl = ("int" | "float" | "bool" | "column" | "table");
+%let decl = ("int" | "float" | "bool" | "string" | "column" | "table");
 %let func = ("max" | "min" | "load" | "media" | "soma" | "subtracao" | "multiplicacao" | "divisao" | "insert" | "logic_comp");
 %let op_rel = ("<" | ">" | ">=" | "<=" | "==" | "!=");
 %let op_log = ("and" | "or");

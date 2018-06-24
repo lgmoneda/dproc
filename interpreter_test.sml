@@ -1,4 +1,4 @@
-exception VarLookupError
+exception VarLookupError and OperationError
 
 
 (* Record functions *)
@@ -66,7 +66,8 @@ fun eval(e:Ast.Exp):Ast.Value =
         Ast.InfixApp(e1, s, e2) => eval_binop(eval(e1), s, eval(e2)) |
         Ast.RelApp(e1, s, e2) => eval_relapp(eval(e1), s, eval(e2)) |
         Ast.VarRef(s) => look_up(s, !record) |
-        Ast.FuncExp(f, args) => apply_func(f, args)
+        Ast.FuncExp(f, args) => apply_func(f, args) |
+        _ => raise OperationError
 
     and eval_binop(v1:Ast.Value, s:string, v2:Ast.Value):Ast.Value =
       case (v1, s, v2) of
@@ -80,7 +81,8 @@ fun eval(e:Ast.Exp):Ast.Value =
         (Ast.Float_v f1, "*", Ast.Float_v f2) => Ast.Float_v(f1*f2) |
         (Ast.Float_v f1, "/", Ast.Float_v f2) => Ast.Float_v(f1 / f2) |
         
-        (Ast.String_v s1, "+", Ast.String_v s2) => Ast.String_v(s1 ^ s2)
+        (Ast.String_v s1, "+", Ast.String_v s2) => Ast.String_v(s1 ^ s2) |
+        _ => raise OperationError
 
     and eval_relapp(v1:Ast.Value, s:string, v2:Ast.Value):Ast.Value = 
       case (v1, s, v2) of
@@ -105,7 +107,8 @@ fun eval(e:Ast.Exp):Ast.Value =
         (Ast.Bool_v true, "or", Ast.Bool_v true) => Ast.Bool_v(true) |
         (Ast.Bool_v true, "or", Ast.Bool_v false) => Ast.Bool_v(true) |
         (Ast.Bool_v false, "or", Ast.Bool_v true) => Ast.Bool_v(true) |
-        (Ast.Bool_v false, "or", Ast.Bool_v false) => Ast.Bool_v(false)
+        (Ast.Bool_v false, "or", Ast.Bool_v false) => Ast.Bool_v(false) |
+        _ => raise OperationError
 
 
     and apply_func(f, args) =
@@ -117,32 +120,37 @@ fun eval(e:Ast.Exp):Ast.Value =
     		"max" => maximo(extractListVal(eval(List.nth(args,0)))) |
     		"min" => minimo(extractListVal(eval(List.nth(args,0)))) |
     		"media" => media(extractListVal(eval(List.nth(args,0)))) |
-    		"logic_comp" => logic_comp(eval(List.nth(args,0)), eval(List.nth(args,1)), eval(List.nth(args,2)), eval(List.nth(args,3)), eval(List.nth(args,4)))
+    		"logic_comp" => logic_comp(eval(List.nth(args,0)), eval(List.nth(args,1)), eval(List.nth(args,2)), eval(List.nth(args,3)), eval(List.nth(args,4))) |
+    		_ => raise OperationError
 
 	
 	and soma(c1:Ast.Value, c2:Ast.Value):Ast.Value =
 		case c2 of
 			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "+", y) ) (extractListVal(c1), c2)) |
 			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "+", Ast.Int_v i) ) (extractListVal(c1))) |
-			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "+", Ast.Float_v f) ) (extractListVal(c1)))
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "+", Ast.Float_v f) ) (extractListVal(c1))) |
+			_ => raise OperationError
 
 	and subtracao(c1:Ast.Value, c2:Ast.Value):Ast.Value =
 		case c2 of
 			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "-", y) ) (extractListVal(c1), c2)) |
 			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "-", Ast.Int_v i) ) (extractListVal(c1))) |
-			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "-", Ast.Float_v f) ) (extractListVal(c1)))
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "-", Ast.Float_v f) ) (extractListVal(c1))) |
+			_ => raise OperationError
 
 	and multiplicacao(c1:Ast.Value, c2:Ast.Value):Ast.Value =
 		case c2 of
 			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "*", y) ) (extractListVal(c1), c2)) |
 			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "*", Ast.Int_v i) ) (extractListVal(c1))) |
-			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "*", Ast.Float_v f) ) (extractListVal(c1)))
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "*", Ast.Float_v f) ) (extractListVal(c1))) |
+			_ => raise OperationError
 
 	and divisao(c1:Ast.Value, c2:Ast.Value):Ast.Value =
 		case c2 of
 			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "/", y) ) (extractListVal(c1), c2)) |
 			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "/", Ast.Int_v i) ) (extractListVal(c1))) |
-			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "/", Ast.Float_v f) ) (extractListVal(c1)))
+			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "/", Ast.Float_v f) ) (extractListVal(c1))) |
+			_ => raise OperationError
 
 	and maximo [] = raise Empty 
  		| maximo [x:Ast.Value] = x
@@ -170,7 +178,8 @@ fun eval(e:Ast.Exp):Ast.Value =
 	and logic_comp(v1:Ast.Value, s:Ast.Value, v2:Ast.Value, v3:Ast.Value, v4:Ast.Value) = 
 		case s of
 			Ast.String_v p =>
-		Ast.List(ListPair.map (fn (x, y) => eval_logic_comp(x, p, y, v3, v4) ) (extractListVal(v1), extractListVal(v2)))
+				Ast.List(ListPair.map (fn (x, y) => eval_logic_comp(x, p, y, v3, v4) ) (extractListVal(v1), extractListVal(v2))) |
+			_ => raise OperationError
 
 	and eval_logic_comp(v1, s, v2, v3, v4) = if isBoolTrue(eval_relapp(v1, s, v2)) then v3 else v4
 
@@ -178,7 +187,8 @@ fun eval(e:Ast.Exp):Ast.Value =
 		case cmd of
 			Ast.VarDec(ID, exp) => insert(ID, eval(exp)) |
 			Ast.Assign(ID, exp) => update(ID, eval(exp)) |
-			Ast.IfThenElse(e, cmd1, cmd2) => if isBoolTrue(eval(e)) = true then processCmd(cmd1) else processCmd(cmd2)
+			Ast.IfThenElse(e, cmd1, cmd2) => if isBoolTrue(eval(e)) = true then processCmd(cmd1) else processCmd(cmd2) |
+			_ => raise OperationError
 
 	and isBoolTrue(b) = 
 		case b of
@@ -190,12 +200,12 @@ fun eval(e:Ast.Exp):Ast.Value =
 			Ast.Int_v f => Ast.Float_v(Real.fromInt(f)) |
 			Ast.Float_v f => Ast.Float_v f
 
-	and check_list_type(vallist:Ast.Value) =
+(*	and check_list_type(vallist:Ast.Value) =
 		case hd(extractListVal(vallist)) of
 			Ast.Int_v i => "int" |
 			Ast.Float_v f => "float" |
 			Ast.String_v s => "string" |
-			Ast.Bool_v b => "bool";
+			Ast.Bool_v b => "bool";*)
 
 val input = concat(readlist("test.dproc"));
 

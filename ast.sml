@@ -32,14 +32,13 @@ Ast = struct
     | Assign of string * Exp
     | LogApp of Exp * string * Exp
     | RelApp of Exp * string * Exp
-    ;
+  ;
 
   datatype Value = Int_v of int
     | String_v of string
     | Float_v of real
     | Bool_v of bool
     | List of Value list
-    | LookupError
     | EndList
     ;
 

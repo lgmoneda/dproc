@@ -57,7 +57,12 @@ declSequence
   ;
 
   blockDecl
-  : KW_decl ID SEMI => ( A.VarDec(ID, A.IntConstant(0)) )
+  : %try KW_decl ID SEMI %where ( KW_decl = "int" ) => ( A.VarDec(ID, A.IntConstant(0)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "float" ) => ( A.VarDec(ID, A.FloatConstant(0.0)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "bool" ) => ( A.VarDec(ID, A.BoolConstant(false)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "string" ) => ( A.VarDec(ID, A.StringConstant("")) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "column" ) => ( A.VarDec(ID, A.IntConstant(0)) )
+  | %try KW_decl ID SEMI %where ( KW_decl = "table" ) => ( A.VarDec(ID, A.IntConstant(0)) )
   ;
 
 
