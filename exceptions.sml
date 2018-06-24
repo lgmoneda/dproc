@@ -5,4 +5,7 @@ Exceptions = struct
 
   exception ParseError of string
 
+  exception VarLookupError 
+
+  exception OperationError
 end

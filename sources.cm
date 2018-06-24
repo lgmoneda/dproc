@@ -3,6 +3,7 @@ Library
   structure DprocTokens
   structure Ast
   structure Helpers
+  structure Exceptions
 is
   $/basis.cm
   $/smlnj-lib.cm
