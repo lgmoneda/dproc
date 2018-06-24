@@ -4,6 +4,8 @@ exception VarLookupError and OperationError
 (* Record functions *)
 val record = ref [ ref ("", Ast.EndList)];
 
+fun reset_record() = record := [ ref ("", Ast.EndList)];
+
 fun isEndList(Ast.EndList) = true
       | isEndList(_) = false
 
@@ -129,6 +131,7 @@ fun eval(e:Ast.Exp):Ast.Value =
 			Ast.List c2 => Ast.List(ListPair.map (fn (x, y) => eval_binop(x, "+", y) ) (extractListVal(c1), c2)) |
 			Ast.Int_v i => Ast.List(map (fn x => eval_binop(x, "+", Ast.Int_v i) ) (extractListVal(c1))) |
 			Ast.Float_v f => Ast.List(map (fn x => eval_binop(x, "+", Ast.Float_v f) ) (extractListVal(c1))) |
+			Ast.String_v s => Ast.List(map (fn x => eval_binop(x, "+", Ast.String_v s) ) (extractListVal(c1))) |
 			_ => raise OperationError
 
 	and subtracao(c1:Ast.Value, c2:Ast.Value):Ast.Value =
@@ -200,19 +203,43 @@ fun eval(e:Ast.Exp):Ast.Value =
 			Ast.Int_v f => Ast.Float_v(Real.fromInt(f)) |
 			Ast.Float_v f => Ast.Float_v f
 
-(*	and check_list_type(vallist:Ast.Value) =
-		case hd(extractListVal(vallist)) of
-			Ast.Int_v i => "int" |
-			Ast.Float_v f => "float" |
-			Ast.String_v s => "string" |
-			Ast.Bool_v b => "bool";*)
+(*val input = concat(readlist("test.dproc"));*)
 
-val input = concat(readlist("test.dproc"));
+fun getArvoreSintatica(input: string): Ast.Exp = Helpers.string_to_ast(input);
 
-fun makeTest(input: string): Ast.Exp = Helpers.string_to_ast(input);
-
-val arvore_sintatica = makeTest(input);
-
+(*
+val arvore_sintatica = getArvoreSintatica(input);
 val cmds = extractList(arvore_sintatica);
+app processCmd cmds;*)
 
-app processCmd cmds; 
+fun makeTest(input:string) = let val _ = reset_record() in
+	app processCmd (extractList(getArvoreSintatica(concat(readlist(input)))))
+end;
+
+val _ = print("\nRodando bateria de testes...\n\n\n");
+
+val _ = print("\n Teste 1 - test_ifelse.dproc\n\n");
+val _ = makeTest("testes/test_ifelse.dproc");
+val _ = print("O valor da variável avg deve ser (Float_v 255.0), e foi calculada como: \n");
+look_up("avg", !record);
+val _ = print("O valor da variável flag deve ser (Bool_v true), e foi calculada como: \n");
+look_up("flag", !record);
+
+val _ = print("\n\n\n Teste 2 - test_log_comp.dproc\n\n");
+val _ = makeTest("testes/test_log_comp.dproc");
+val _ = print("O valor da variável c deve ser [Int_v 4, Int_v 4, Int_v 2, Int_v 2, Int_v 4], e foi calculada como: \n");
+look_up("c", !record);
+val _ = print("O valor da variável d deve ser [Int_v 1, Int_v 0, Int_v 0, Int_v 1, Int_v 0], e foi calculada como: \n");
+look_up("d", !record);
+
+val _ = print("\n\n\n Teste 3 - test_oper.dproc\n\n");
+val _ = makeTest("testes/test_oper.dproc");
+val _ = print("O valor da variável a deve ser [Float_v 0.6, Float_v 1.04, Float_v 0.54, Float_v 0.64], e foi calculada como: \n");
+look_up("a", !record);
+
+val _ = print("\n\n\n Teste 4 - test_strings.dproc\n\n");
+val _ = makeTest("testes/test_strings.dproc");
+val _ = print("O valor da variável result deve ser [String_v \"Ola, esse \", String_v \"e um \", String_v \"teste da \", String_v \"linguagem DPROC!\"], e foi calculada como: \n");
+look_up("result", !record);
+val _ = print("O valor da variável result2 deve ser [String_v \"oi!\", String_v \"tchau!\"], e foi calculada como: \n");
+look_up("result2", !record);

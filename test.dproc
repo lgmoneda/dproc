@@ -1,9 +1,0 @@
-column x;
-column y;
-bool a;
-float c;
-
-x = [2, 3, 3];
-y = [4, 1, 10];
-c = media(x);
-if c == 1.0 then a=true else a=false;

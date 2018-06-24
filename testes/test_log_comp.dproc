@@ -1,0 +1,10 @@
+column a;
+column b;
+column c;
+column d;
+
+a = [5, 1, 2, 4, 3];
+b = [2, 2, 1, 1, 2];
+
+c = multiplicacao(b, 2);
+d = logic_comp(a, ">", c, 1, 0);
