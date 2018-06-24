@@ -5,24 +5,18 @@
 );
 
 %tokens
-  : KW_let ("let") | KW_in ("in") | KW_end ("end")
-  | KW_fn ("fn") | KW_fun ("fun") | KW_val ("val")
-  | KW_if ("if") | KW_then ("then") | KW_else ("else")
-  | KW_andalso ("andalso") | KW_orelse ("orelse")
+    KW_if ("if") | KW_then ("then") | KW_else ("else")
   | CON_int of Int.int | CON_string of string
   | ID of string | OP of string
-  | LP ("(") | RP (")") | COMMA (",") | SEMI (";")| COLON (":")
+  | LP ("(") | RP (")") | COMMA (",") | SEMI (";")
   | LB ("[") | RB ("]")
-  | ARROW ("=>") | TARROW ("->")
-
-
   | CON_float of real | KW_decl of string | KW_func of string | KW_teste ("teste") | ASSIGN ("=") | OP_rel of string | OP_log of string
   | CON_bool of bool
   ;
 
-%start exp;
+%start program;
 
-exp
+program
   : %try declSequence cmdSequence SEMI => ( A.Sequence(declSequence @ cmdSequence ))
   | %try blockCmd SEMI cmdSequence  SEMI => ( A.Sequence(blockCmd :: cmdSequence) )
   | %try blockExp SEMI
@@ -94,9 +88,8 @@ simpleExp
   | CON_bool => ( A.BoolConstant(CON_bool) )
   | CON_string => ( A.StringConstant(CON_string) )
   | ID => ( A.VarRef(ID) )
-  | %try LP exp RP => ( exp )
+  | %try LP simpleExp RP => ( simpleExp )
   | %try LB blockExp COMMA explist RB => ( A.Tuple(blockExp :: explist) )
-  | LP RP => ( A.Unit )
   ;
 
 explist

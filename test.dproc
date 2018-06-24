@@ -1,7 +1,9 @@
 column x;
 column y;
-column z;
+bool a;
+float c;
 
 x = [2, 3, 3];
 y = [4, 1, 10];
-z = logic_comp(x, ">", y, 1, 0);
+c = media(x);
+if c == 1.0 then a=true else a=false;
