@@ -8,8 +8,8 @@ is
   $/basis.cm
   $/smlnj-lib.cm
   $/ml-lpt-lib.cm
-  dproc.grm : ml-antlr
-  dproc.lex : ml-ulex
-  ast.sml
-  helpers.sml
-  exceptions.sml
+  src/dproc.grm : ml-antlr
+  src/dproc.lex : ml-ulex
+  src/ast.sml
+  src/helpers.sml
+  src/exceptions.sml
