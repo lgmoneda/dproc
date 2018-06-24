@@ -1,0 +1,2 @@
+#!/bin/bash
+sml sources.cm interpreter.sml
