@@ -8,10 +8,11 @@ Dproc programming language compiler
 3. [User manual](#user-manual)
     1. [Install](#install)
     2. [Variable definition](#var-def)
-    3. [Built-in functions](#builtin-func)
-    4. [Running a dproc file](#run)
+    3. [Built-in functions](#builtin-functions)
+    4. [Running a dproc file](#running-a-dproc-file)
     5. [Analysing results](#results)
 4. [Examples](#examples)
+5. [References](#references)
 
 ### About
 
@@ -20,10 +21,45 @@ Dproc is a data processing oriented language. It's intended to process and auto 
 ### Files structure
 
 ``` 
--src/dproc.lex: token definition
+src/dproc.lex: token definition
+src/dproc.grm: grammar 
+src/interpreter.sml: execution
 ```
 
 ### User Manual
+
+#### Install
+
+In order to run it, you need to install SML:
+
+Linux:
+``` 
+apt-get install smlnj
+```
+
+MacOS:
+
+``` 
+brew update
+brew install smlnj
+```
+
+#### Bultin Functions
+
+- Arithmetic: sum (+), subtraction (-), product (*) and division (/);
+- Logical: greater (>), greater or equal (>=), less (<), less or equal (<=), equal (==) and different (!-);
+- Boolean: and (and), or (or).
+
+#### Running a dproc file
+
+You can run dproc files as follows:
+
+``` 1c-enterprise
+./dproc my_program.dproc
+```
+
+It's going to be executed and it will generate a log file called `my_program.log`.
+
 ### Examples
 
 ``` 
@@ -64,3 +100,6 @@ The log would be:
 ```
 
 
+### References
+
+[SML Language Processing Tools User Guide])(https://www.smlnj.org/doc/ml-lpt/manual.pdf)
