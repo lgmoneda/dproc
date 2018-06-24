@@ -1,24 +1,37 @@
-(*fun makeTest(input: string): MumlTokens.token list = Helpers.string_to_tokens(input);*)
+exception VarLookupError
+
 
 (* Record functions *)
-val record = ref [("", Ast.EndList)];
+val record = ref [ ref ("", Ast.EndList)];
 
 fun isEndList(Ast.EndList) = true
       | isEndList(_) = false
 
-fun isNil(x:(string * Ast.Value) list):bool =
-	let val (_,value) = hd(x) in
+fun isNil(x:(string * Ast.Value) ref list):bool =
+	let val (_,value) = !(hd(x)) in
 		if isEndList(value) then true else false
 	end
 
-fun insert(label, exp) = (record := [(label, exp)] @ !record);
+fun insert(label, exp) = (record := ([ ref (label, exp)] @ !record));
 
-fun look_up(label:string, rcd:(string * Ast.Value) list):Ast.Value = 
-	let val (var_label, var_record) = hd(rcd)
+fun look_up(label:string, rcd: (string * Ast.Value) ref list):Ast.Value = 
+	let val (var_label, var_record) = !(hd(rcd))
 	in 
 		if var_label = label then var_record else 
-			if isNil(tl(rcd)) then  Ast.LookupError else look_up(label, tl(rcd))
+			if isNil(tl(rcd)) then raise VarLookupError else look_up(label, tl(rcd))
 	end
+
+fun look_up_ref(label:string, rcd: (string * Ast.Value) ref list):(string * Ast.Value) ref = 
+	let val (var_label, var_record) = !(hd(rcd)); val possible_match = hd(rcd)
+	in 
+		if var_label = label then possible_match else 
+			if isNil(tl(rcd)) then raise VarLookupError else look_up_ref(label, tl(rcd))
+	end
+
+fun update(label:string, v:Ast.Value) = 
+	let val match = look_up_ref(label, !record) in
+		match := (label, v)
+	end;
 
 
 
@@ -164,7 +177,7 @@ fun eval(e:Ast.Exp):Ast.Value =
     and processCmd (cmd:Ast.Exp) = 
 		case cmd of
 			Ast.VarDec(ID, exp) => insert(ID, eval(exp)) |
-			Ast.Assign(ID, exp) => insert(ID, eval(exp)) |
+			Ast.Assign(ID, exp) => update(ID, eval(exp)) |
 			Ast.IfThenElse(e, cmd1, cmd2) => if isBoolTrue(eval(e)) = true then processCmd(cmd1) else processCmd(cmd2)
 
 	and isBoolTrue(b) = 
