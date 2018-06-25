@@ -7,10 +7,9 @@ Dproc programming language compiler
 2. [File structure](#file-structure)
 3. [User manual](#user-manual)
     1. [Install](#install)
-    2. [Variable definition](#var-def)
-    3. [Built-in functions](#builtin-functions)
-    4. [Running a dproc file](#running-a-dproc-file)
-    5. [Analysing results](#results)
+    2. [Built-in functions](#builtin-functions)
+    3. [Running a dproc file](#running-a-dproc-file)
+	4. [Running the tests](#running-the-tests)
 4. [Examples](#examples)
 5. [References](#references)
 
@@ -60,9 +59,19 @@ You can run dproc files as follows:
 
 It's going to be executed and it will generate a log file called `my_program.log`.
 
+All the variables final values will be displayed.
+
+#### Running the tests
+
+Just call:
+
+``` python
+./dproc_tests
+```
+
 ### Examples
 
-``` sml
+``` standard-ml
 column a;
 column b;
 column c;
@@ -73,6 +82,21 @@ b = [2, 2, 1, 1, 2];
 
 c = multiplicacao(b, 2);
 d = logic_comp(a, ">", c, 1, 0);
+```
+
+Generates:
+
+``` standard-ml
+Running tests/test_log_comp.dproc
+val it = () : unit
+Varibles:
+val it = ["a","b","c","d"] : string list
+Their values:
+val it =
+  [List [Int_v 5,Int_v 1,Int_v 2,Int_v 4,Int_v 3],
+   List [Int_v 2,Int_v 2,Int_v 1,Int_v 1,Int_v 2],
+   List [Int_v 4,Int_v 4,Int_v 2,Int_v 2,Int_v 4],
+   List [Int_v 1,Int_v 0,Int_v 0,Int_v 1,Int_v 0]] : Ast.Value list
 ```
 
 <!-- ```  -->

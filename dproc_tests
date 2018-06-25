@@ -1,2 +1,2 @@
 #!/bin/bash
-sml sources.cm interpreter.sml
+sml sources.cm src/examples_test.sml 
