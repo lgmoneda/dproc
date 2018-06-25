@@ -1,4 +1,4 @@
-use "src/interpreter_core.sml";
+use "src/interpreter.sml";
 
 fun run_program(input:string) = let val _ = reset_record() in
 	app processCmd (extractList(getArvoreSintatica(concat(readlist(input)))))
